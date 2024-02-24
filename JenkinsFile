@@ -32,10 +32,10 @@ pipeline {
                     slackSend color: 'good', message: 'Dependencies installed successfully'
                 }
                 
-                failure {
-                    slackSend color: '#ff0000', message: 'Dependencies build failed'
-                    echo 'Dependencies failed to build'.
-                }
+               failure {
+                slackSend color: '#ff0000', message: 'Dependencies build failed'
+                echo 'Dependencies failed to build'
+            }
             }
         }
         
@@ -70,7 +70,7 @@ pipeline {
                 }
                 
                 failure {
-                    echo 'App failed o. Just hold on.'
+                    slackSend color: '#ff0000', message: 'Deployment failed'
                 }
             }
         }
