@@ -16,7 +16,16 @@ pipeline {
         
         stage('Checkout') {
             steps {
-                checkout scm
+               git 'https://github.com/G-Okumu/gallery.git'
+            }
+
+            post{
+                success {
+                    slackSend color: 'good', message: 'Checkout complete'
+                }
+                failure {
+                    slackSend color: 'good', message: 'Checkout failed'
+                }
             }
         }
         
