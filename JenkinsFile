@@ -1,0 +1,79 @@
+pipeline {
+
+    agent any
+    
+    tools {nodejs 'node-18'}
+    
+    
+    stages {
+        
+        
+         stage('Alert that build has started on slack'){
+            steps{
+                slackSend color: "good", message: "Pipeline for gallery app started, one might have pushed to branch: master"
+            }
+        }
+        
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('build application') {
+            steps {
+                echo "Installing........"
+                sh 'npm install'
+            }
+            
+            post {
+                success {
+                    echo 'Dependencies installed successfully'
+                    slackSend color: 'good', message: 'Dependencies installed successfully'
+                }
+                
+                failure {
+                    slackSend color: '#ff0000', message: 'Dependencies build failed'
+                    echo 'Dependencies failed to build'.
+                }
+            }
+        }
+        
+        stage('Running tests'){
+            steps{
+                slackSend color:'#0000FF', 'message': 'Initiating npm test'
+                sh 'npm test'
+            }
+            
+            post {
+                success {
+                    slackSend color: 'good', message: 'All tests passing'
+                    emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+                }
+                
+                failure {
+                    slackSend color: '#ff0000', message: 'Some tests might be failing.Kindly check asap'
+                    emailext body: 'Some tests are failing, intervene quickly', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Running tests'
+                }
+            }
+        }
+        
+        stage('Deploy to render'){
+            
+            steps {
+                slackSend color: 'good', message: 'https://devopsgallery.onrender.com/'
+                echo 'Deploying to render....'
+            }
+            
+            post {
+                success {
+                    
+                }
+                
+                failure {
+                    echo 'App failed o. Just hold on.'
+                }
+            }
+        }
+    }
+}
