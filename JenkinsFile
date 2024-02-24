@@ -61,13 +61,12 @@ pipeline {
         stage('Deploy to render'){
             
             steps {
-                slackSend color: 'good', message: 'https://devopsgallery.onrender.com/'
                 echo 'Deploying to render....'
             }
             
             post {
                 success {
-                    
+                    slackSend color: 'good', message: 'https://devopsgallery.onrender.com/'
                 }
                 
                 failure {
